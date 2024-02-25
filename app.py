@@ -12,11 +12,11 @@ def setup():
   if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
     print(Fore.RED + f'Email "{email}" is invalid')
     exit()
-  password = input(Fore.YELLOW + "Password (has to be the same for all of your ads): " + Fore.WHITE)
   phone = input(Fore.YELLOW + "Phone number (example: 792123456): " + Fore.WHITE)
   if not re.match(r'^\d{9}$', phone):
     print(Fore.RED + f'Phone number "{phone}" is invalid')
     exit()
+  password = input(Fore.YELLOW + "Password (has to be the same for all of your ads): " + Fore.WHITE)
   phone_number_request = requests.post("https://ostatni.bazos.cz/pridat-inzerat.php", data={
     "podminky": "1",
     "teloverit": phone,
