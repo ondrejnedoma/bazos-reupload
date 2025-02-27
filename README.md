@@ -1,15 +1,17 @@
 # bazos-reupload
+
 A Python script to delete and upload all Bazoš ads again to make them more relevant
 
 ## Usage
+
 - Install Python dependencies
-    ```sh
-    pip install PyYAML pyquery
-    ```
+  ```sh
+  pip install PyYAML requests pyquery
+  ```
 - Run the script using Python
-    ```sh
-    py app.py
-    ```
+  ```sh
+  py app.py
+  ```
 - On the first run, you will be asked for 3 things
   - The e-mail address used on Bazoš
   - The phone number used on Bazoš
