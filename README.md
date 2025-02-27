@@ -6,7 +6,7 @@ A Python script to delete and upload all Bazoš ads again to make them more rele
 
 - Install Python dependencies
   ```sh
-  pip install PyYAML requests pyquery
+  pip install PyYAML requests pyquery colorama
   ```
 - Run the script using Python
   ```sh
