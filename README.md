@@ -4,6 +4,9 @@ A Python script to delete and upload all Bazoš ads again to make them more rele
 
 ## Usage
 
+> [!IMPORTANT]  
+> As of April 2026, Bazoš has implemented a new security measure that requires users to verify their bank accounts before interacting with most of the website's features, including ad management. This script will not work until you have completed the bank account verification process on Bazoš for your phone number by sending 1 CZK to their bank account with your phone number in the transaction note.
+
 - Install Python dependencies
   ```sh
   pip install PyYAML requests pyquery colorama
@@ -20,7 +23,7 @@ A Python script to delete and upload all Bazoš ads again to make them more rele
 - Profit!
 
 > [!NOTE]  
-> All these credentials will be saved into a local `config.yaml` file, so that you don't have to provide them every time you run this script
+> All these credentials will be saved into a local `config.yaml` file, so that you don't have to provide them every time you run this script.
 
 > [!CAUTION]
-> Running this script too often may get you banned from Bazoš in one way or another. I've been it using it twice a week without any issues so far. You have been warned.
+> Running this script too often may get you banned from Bazoš in one way or another. I've been using it twice a week without any issues so far. You have been warned.
