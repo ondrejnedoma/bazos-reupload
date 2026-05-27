@@ -6,6 +6,14 @@ from pyquery import PyQuery as pq
 from colorama import init, Fore
 init()
 
+def sanitize_path_component(value):
+  sanitized = re.sub(r'[<>:\"/\\|?*]+', '_', value)
+  sanitized = sanitized.strip().rstrip('. ')
+  return sanitized
+
+def get_image_dir(title):
+  return os.path.join('./img', sanitize_path_component(title))
+
 def setup():
   print(Fore.CYAN + "No config found, launching initial setup\nAvoid inputting special characters (ˇ,´,ů...)")
   email = input(Fore.YELLOW + "E-mail: " + Fore.WHITE)
@@ -57,11 +65,6 @@ def get_all_ads():
   query = pq(all_ads_request.text)
   return query('div.inzeraty > div.inzeratynadpis > a').map(lambda i, e: query(e).attr("href"))
 
-def clear_images():
-  files = os.listdir("./")
-  filtered_files = [file for file in files if file.endswith(".jpg")]
-  for file in filtered_files:
-    os.remove("./" + file)
 
 def get_ad_data(link):
   ad_info = {}
@@ -83,14 +86,20 @@ def get_ad_data(link):
     filtered_thumbnails.pop(0)
     filtered_thumbnails.map(lambda i, e: images.append(query(e).attr("src").replace("t/", "/")))
   ad_info["images"] = images
+  ad_info["image_dir"] = get_image_dir(ad_info["title"])
   return ad_info
 
-def download_images(images):
-  for i, image in enumerate(images):
+def download_images(images, image_dir):
+  os.makedirs(image_dir, exist_ok=True)
+  for i, image in enumerate(images, start=1):
+    image_path = os.path.join(image_dir, f"{i}.jpg")
+    if os.path.exists(image_path):
+      continue
     image_request = requests.get(image, stream=True)
-    with open("./" + str(i) + ".jpg", "wb") as image_file:
-      for chunk in image_request:
-        image_file.write(chunk)
+    with open(image_path, "wb") as image_file:
+      for chunk in image_request.iter_content(chunk_size=8192):
+        if chunk:
+          image_file.write(chunk)
 
 
 def delete_ad(id, domain):
@@ -100,10 +109,12 @@ def delete_ad(id, domain):
     "administrace": "Vymazat",
   }, headers={'Content-Type': 'application/x-www-form-urlencoded'}, cookies={'bid': config["bid"], 'bkod': config["bkod"]})
 
-def upload_images(images, domain):
+def upload_images(images, domain, image_dir):
   image_links = []
-  for i, image in enumerate(images):
-    image_request = requests.post("https://" + domain + "/upload.php", files={"file[0]": open("./" + str(i) + ".jpg", "rb")})
+  for i, _image in enumerate(images, start=1):
+    image_path = os.path.join(image_dir, f"{i}.jpg")
+    with open(image_path, "rb") as image_file:
+      image_request = requests.post("https://" + domain + "/upload.php", files={"file[0]": image_file})
     image_links.append(image_request.json()[0])
   return image_links
 
@@ -141,13 +152,12 @@ except:
   with open('./config.yaml', 'r') as config_file:
     config = yaml.load(config_file, Loader=yaml.FullLoader)
 
-clear_images()
+os.makedirs('./img', exist_ok=True)
 all_ads = get_all_ads()
 print(Fore.BLUE + "Found " + str(len(all_ads)) + " ads" + Fore.WHITE)
 for one_ad in all_ads:
   info = get_ad_data(one_ad)
-  download_images(info["images"])
+  download_images(info["images"], info["image_dir"])
   delete_ad(info["id"], info["domain"])
-  image_links = upload_images(info["images"], info["domain"])
-  clear_images()
+  image_links = upload_images(info["images"], info["domain"], info["image_dir"])
   create_ad(info, image_links)
